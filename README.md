@@ -21,4 +21,5 @@ Create a scheduled job and configure triggers to run the job whenever needed. Us
 
 ----
 ### Todo
-* So much!
+* Sort out the logging and console.writelines with log4net calls
+* Put seasnake mappings into config 

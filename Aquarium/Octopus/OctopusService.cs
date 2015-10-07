@@ -12,24 +12,24 @@ namespace Aquarium.Octopus
     public class OctopusService
     {
         private readonly IBus _bus;
-        private readonly IMapOctopusConsumers _mapOctopusConsumersContainer;
-        private readonly List<IDisposable> _cancellationTokens = new List<IDisposable>();
+        private readonly IMapRabbitMqConsumers _mapRabbitMqConsumers;
+        private readonly List<IDisposable> _subscriptionsToDispose = new List<IDisposable>();
         private readonly CancellationTokenSource _cancellationToken;
         private static int _tasksInProgressCount = 0;
 
-        public OctopusService(IBus bus, IMapOctopusConsumers mapOctopusConsumersContainer)
+        public OctopusService(IBus bus, IMapRabbitMqConsumers mapRabbitMqConsumers)
         {
             _bus = bus;
-            _mapOctopusConsumersContainer = mapOctopusConsumersContainer;
+            _mapRabbitMqConsumers = mapRabbitMqConsumers;
             _cancellationToken = new CancellationTokenSource();
         }
 
         public bool Start()
         {
-            foreach (var mapping in _mapOctopusConsumersContainer.Mappings)
+            foreach (var mapping in _mapRabbitMqConsumers.Mappings)
             {
                 var result = _bus.SubscribeAsync(mapping.Value.EventType, mapping.Value.SubscriptionId, b => StartNew((Message)b, mapping.Value, _cancellationToken), sub => sub.WithTopic(mapping.Value.Topic));
-                _cancellationTokens.Add(result);
+                _subscriptionsToDispose.Add(result);
             }
 
             return true;
@@ -43,7 +43,7 @@ namespace Aquarium.Octopus
             WaitForMessagesInProgressToFinish();
 
             // kill all subscribers connection to rabbit
-            foreach (var cancellationToken in _cancellationTokens)
+            foreach (var cancellationToken in _subscriptionsToDispose)
                 cancellationToken.Dispose();
 
             return true;
@@ -62,9 +62,9 @@ namespace Aquarium.Octopus
             }
         }
 
-        private static Task StartNew(Message b, ConsumerConfiguration config, CancellationTokenSource cancellationToken)
+        private static Task StartNew(Message message, RabbitMqConsumerConfiguration config, CancellationTokenSource cancellationToken)
         {
-            Console.WriteLine("OUTSIDE THREAD " + Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine("Starting new task, thread " + Thread.CurrentThread.ManagedThreadId);
             var task = Task.Factory.StartNew(() =>
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -76,7 +76,7 @@ namespace Aquarium.Octopus
                 _tasksInProgressCount++;
                 Console.WriteLine("SETUP THREAD " + Thread.CurrentThread.ManagedThreadId);
                 var handler = (IConsumeMessages)Container.Resolve(config.HandlerType);
-                handler.OnConsume(b);
+                handler.OnConsume(message);
             }).ContinueWith(t => _tasksInProgressCount--);
 
             return task;

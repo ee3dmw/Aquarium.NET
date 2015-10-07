@@ -1,6 +1,5 @@
 using System;
 using Aquarium.GiftShop.CastleWindsor;
-using Aquarium.GiftShop.RabbitMQ;
 using Topshelf;
 using Topshelf.ServiceConfigurators;
 
@@ -27,7 +26,7 @@ namespace Aquarium.Octopus
                     });
                 }));
 
-                x.RunAsLocalSystem();
+                x.RunAsLocalService();
 
 
                 x.SetDescription(serviceDescription);

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Castle.Windsor;
+﻿using Castle.Windsor;
 using Quartz;
 using Quartz.Spi;
 
-namespace Aquarium.GiftShop.CastleWindsor
+namespace Aquarium.GiftShop.Quartz
 {
     public class WindsorJobFactory : IJobFactory
     {

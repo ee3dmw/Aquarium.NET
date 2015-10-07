@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Aquarium.GiftShop.CastleWindsor;
-using Aquarium.GiftShop.EasyNetQ;
+using Aquarium.GiftShop.Quartz;
 using Aquarium.GiftShop.TopShelf;
-using Castle.MicroKernel.Registration;
-using Castle.MicroKernel.SubSystems.Configuration;
-using Castle.Windsor;
-using EasyNetQ;
 using Quartz;
 using Topshelf;
 using Topshelf.Quartz;
@@ -66,22 +62,5 @@ namespace Aquarium.SeaSnake
                 x.SetServiceName(serviceName);
             });
         }
-    }
-
-    public class SeaSnakeContainerInstaller : IWindsorInstaller
-    {
-        public void Install(IWindsorContainer container, IConfigurationStore store)
-        {
-            //container.Register(Component.For<IConsumerMappings>().ImplementedBy<BlankMappingsContainer>().LifestyleSingleton());
-            //container.Register(Component.For<IProducerMappings>().ImplementedBy<ProducerMappingsContainer>().LifestyleSingleton());
-            container.Register(Component.For<IBus>().UsingFactoryMethod(BusBuilder.CreateMessageBus).LifestyleSingleton());
-        }
-    }
-
-    public class JobConfig
-    {
-        public Type JobType { get; set; }
-        public string JobDescription { get; set; }
-        public ITrigger JobTrigger { get; set; }
     }
 }

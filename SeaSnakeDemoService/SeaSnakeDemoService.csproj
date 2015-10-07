@@ -85,8 +85,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CleanTankJob.cs" />
+    <Compile Include="CleanTankTimeMessage.cs" />
+    <Compile Include="FeedingTimeMessage.cs" />
+    <Compile Include="FeedingTimeJob.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeaSnakeDemoContainerInstaller.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
